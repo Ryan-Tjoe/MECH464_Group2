@@ -11,9 +11,10 @@ void receiveXYZ() {
     tcp::socket socket(io_service);
 
     // Connect to the Python server
-    socket.connect(tcp::endpoint(boost::asio::ip::address::from_string("192.168.1.100"), 5000));
+    socket.connect(tcp::endpoint(boost::asio::ip::address::from_string("127.0.0.1"), 5000));
 
     while (true) {
+        std::cout << "Waiting for data..." << std::endl;
         boost::asio::streambuf buf;
         boost::asio::read_until(socket, buf, "\n");  // Read data until newline
 
