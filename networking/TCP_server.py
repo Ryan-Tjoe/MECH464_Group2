@@ -14,9 +14,19 @@ def start_server():
     conn, addr = server_socket.accept()
     print(f"Connected to {addr}")
 
+    # TODO: Initialize the pose estimator here and realsense camera
+
     try:
         while True:
-            # Generate fake XYZ data (Replace with real ML estimation)
+
+            # TODO: Camera captures image and passes it to the pose estimator. Pose estimator will output some data (coordiantes or numbers)
+
+            # We will also use the coordinates of the joint found by the pose estimator to find the depth at each joint
+
+            # 
+
+            # 
+            # 
             data = {"x": 10.5, "y": -3.2, "z": 1.7}
             print(f"Sending data: {data}")
             json_data = json.dumps(data)
@@ -30,6 +40,12 @@ def start_server():
     finally:
         conn.close()
         server_socket.close()
+
+def convert_pixels_to_m():
+    # TODO: we need to find a way to convert the pixel values in x and y to meters. 
+    pass
+
+
 
 if __name__ == "__main__":
     start_server()
