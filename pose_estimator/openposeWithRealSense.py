@@ -6,6 +6,19 @@ import argparse
 import time
 from realsense import RealSenseCamera 
 
+def get_angle_2d(pointA, pointB, pointC):
+    a = np.array(pointA)
+    b = np.array(pointB)
+    c = np.array(pointC)
+
+    ba = a - b
+    bc = c - b
+
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle_rad = np.arccos(np.clip(cosine_angle, -1.0, 1.0))
+
+    return np.degrees(angle_rad)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
 parser.add_argument('--thr', default=0.2, type=float, help='Threshold value for pose parts heat map')
@@ -81,7 +94,32 @@ while cv.waitKey(1) < 0:
                 cv.FONT_HERSHEY_SIMPLEX, 0.4,    # Font size (smaller for readability)
                 (255, 255, 255), 1,              # White text color and thickness 2
                 lineType=cv.LINE_AA)             # Anti-aliased for smoothness
+    
+    # Helper function to get a 2D point if it exists
+    def get_2d_point(part):
+        part_id = BODY_PARTS[part]
+        point = points[part_id]
+        return point if point else None
 
+    # Right Elbow Angle Calculation (Wrist-Elbow-Shoulder)
+    r_wrist = get_2d_point("RWrist")
+    r_elbow = get_2d_point("RElbow")
+    r_shoulder = get_2d_point("RShoulder")
+
+    if r_wrist and r_elbow and r_shoulder:
+        elbow_angle = get_angle_2d(r_wrist, r_elbow, r_shoulder)
+        cv.putText(frame, f"Elbow: {elbow_angle:.1f} deg", 
+               (r_elbow[0]+15, r_elbow[1]-15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
+        print(f"Right Elbow Angle: {elbow_angle:.2f} degrees")
+
+    # Right Shoulder Angle Calculation (Elbow-Shoulder-Neck)
+    neck = get_2d_point("Neck")
+
+    if r_elbow and r_shoulder and neck:
+        shoulder_angle = get_angle_2d(r_elbow, r_shoulder, neck)
+        cv.putText(frame, f"Shoulder: {shoulder_angle:.1f} deg", 
+               (r_shoulder[0]+15, r_shoulder[1]-15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
+        print(f"Right Shoulder Angle: {shoulder_angle:.2f} degrees")
 
     # Optionally, print the coordinates in the terminal using the following code:
     
