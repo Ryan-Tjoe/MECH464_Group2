@@ -19,6 +19,26 @@ def get_angle_2d(pointA, pointB, pointC):
 
     return np.degrees(angle_rad)
 
+'''
+def get_angle_3d(pointA, pointB, pointC):
+    # Convert points to numpy arrays
+    a = np.array(pointA)
+    b = np.array(pointB)
+    c = np.array(pointC)
+    
+    # Vectors
+    ba = a - b
+    bc = c - b
+    
+    # Cosine angle calculation
+    cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+    angle_rad = np.arccos(np.clip(cosine_angle, -1.0, 1.0))  # Clipping to avoid numerical errors
+    
+    angle_deg = np.degrees(angle_rad)
+    
+    return angle_deg
+'''
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
 parser.add_argument('--thr', default=0.2, type=float, help='Threshold value for pose parts heat map')
@@ -120,6 +140,33 @@ while cv.waitKey(1) < 0:
         cv.putText(frame, f"Shoulder: {shoulder_angle:.1f} deg", 
                (r_shoulder[0]+15, r_shoulder[1]-15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
         print(f"Right Shoulder Angle: {shoulder_angle:.2f} degrees")
+
+    # Assuming depth is already available from your existing script
+    
+    # 3D Angle
+# def get_3d_point(part):
+#     part_id = BODY_PARTS[part]
+#     point = points[part_id]
+#     if point:
+#         depth = camera.get_depth_at(point[0], point[1])
+#         return (point[0], point[1], depth)
+#     return None
+
+# # Right Elbow Angle Calculation (Wrist-Elbow-Shoulder)
+# r_wrist = get_3d_point("RWrist")
+# r_elbow = get_3d_point("RElbow")
+# r_shoulder = get_3d_point("RShoulder")
+
+# if r_wrist and r_elbow and r_shoulder:
+#     elbow_angle = get_angle_3d(r_wrist, r_elbow, r_shoulder)
+#     print(f"Right Elbow Angle: {elbow_angle:.2f} degrees")
+
+# # Right Shoulder Angle Calculation (Elbow-Shoulder-Neck)
+# neck = get_3d_point("Neck")
+
+# if r_elbow and r_shoulder and neck:
+#     shoulder_angle = get_angle_3d(r_elbow, r_shoulder, neck)
+#     print(f"Right Shoulder Angle: {shoulder_angle:.2f} degrees")
 
     # Optionally, print the coordinates in the terminal using the following code:
     
