@@ -4,6 +4,11 @@ import cv2 as cv
 import numpy as np
 import argparse
 import time
+from pathlib import Path
+
+PROJECT_ROOT = str(Path(__file__).resolve().parents[1])
+print(PROJECT_ROOT)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
@@ -27,7 +32,7 @@ POSE_PAIRS = [ ["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElb
 inWidth = args.width
 inHeight = args.height
 
-net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
+net = cv.dnn.readNetFromTensorflow(f"{PROJECT_ROOT}/pose_estimator/graph_opt.pb")
 
 cap = cv.VideoCapture(args.input if args.input else 0)
 
