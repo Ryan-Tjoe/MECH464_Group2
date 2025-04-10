@@ -27,7 +27,7 @@ POSE_PAIRS = [ ["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElb
 inWidth = args.width
 inHeight = args.height
 
-net = cv.dnn.readNetFromTensorflow("C:/Users/dania/OneDrive - UBC/ELEC 442/MECH464_Group2/pose_estimator/graph_opt.pb")
+net = cv.dnn.readNetFromTensorflow("C:/Users/dania/OneDrive - UBC/ELEC 442/MECH464_Group2/pose_estimator/graph_opt.pb") # Change this directory to you own computer's dir
 
 cap = cv.VideoCapture(args.input if args.input else 0)
 
