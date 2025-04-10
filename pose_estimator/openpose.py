@@ -27,9 +27,16 @@ POSE_PAIRS = [ ["Neck", "RShoulder"], ["Neck", "LShoulder"], ["RShoulder", "RElb
 inWidth = args.width
 inHeight = args.height
 
-net = cv.dnn.readNetFromTensorflow("graph_opt.pb")
+net = cv.dnn.readNetFromTensorflow("C:/Users/dania/OneDrive - UBC/ELEC 442/MECH464_Group2/pose_estimator/graph_opt.pb")
 
 cap = cv.VideoCapture(args.input if args.input else 0)
+
+def angle_with_axis(p1, vertex, axis_start, axis_end):
+    """Calculates the angle between the line (p1-vertex) and the axis (axis_start-axis_end)."""
+    v1 = np.array(p1) - np.array(vertex)
+    v2 = np.array(axis_end) - np.array(axis_start)
+    cosine = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    return np.degrees(np.arccos(np.clip(cosine, -1.0, 1.0)))
 
 while cv.waitKey(1) < 0:
     hasFrame, frame = cap.read()
@@ -75,6 +82,29 @@ while cv.waitKey(1) < 0:
                 (255, 255, 255), 1,              # White text color and thickness 2
                 lineType=cv.LINE_AA)             # Anti-aliased for smoothness
 
+    # Get required points
+    neck = points[BODY_PARTS["Neck"]]
+    r_shoulder = points[BODY_PARTS["RShoulder"]]
+    r_elbow = points[BODY_PARTS["RElbow"]]
+    r_wrist = points[BODY_PARTS["RWrist"]]
+
+    if neck and r_shoulder and r_elbow and r_wrist:
+        # Axis: Neck → Right Shoulder
+        axis_start = neck
+        axis_end = r_shoulder
+
+        # Elbow angle w.r.t. axis
+        elbow_angle = angle_with_axis(r_wrist, r_elbow, axis_start, axis_end)
+        cv.putText(frame, f"Elbow: {elbow_angle:.1f}", (r_elbow[0]+10, r_elbow[1]-10),
+                cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+
+        # Shoulder angle w.r.t. axis
+        shoulder_angle = angle_with_axis(r_elbow, r_shoulder, axis_start, axis_end)
+        cv.putText(frame, f"Shoulder: {shoulder_angle:.1f}", (r_shoulder[0]+10, r_shoulder[1]-10),
+                cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+
+        print(f"Elbow Angle wrt Neck-RShoulder axis: {elbow_angle:.2f}°")
+        print(f"Shoulder Angle wrt Neck-RShoulder axis: {shoulder_angle:.2f}°")
 
     # Optionally, print the coordinates in the terminal using the following code:
     
