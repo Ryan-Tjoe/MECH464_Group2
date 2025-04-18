@@ -17,9 +17,11 @@ class Server:
         return conn
     
     def send_data(self, conn: socket, data):
+        print(f"Sending data: {data}")
         json_data = json.dumps(data)
         conn.sendall(json_data.encode("utf-8"))
         conn.sendall(b"\n")
+        print("Data sent successfully.")
 
 if __name__ == "__main__":
     HOST = "0.0.0.0"  # Listen on all available network interfaces
@@ -34,10 +36,6 @@ if __name__ == "__main__":
             time.sleep(0.1)  # Simulate real-time transmission
         except KeyboardInterrupt:
             print("Server shutting down.")
-            break
-        finally:
-            conn.close()
-            server.server_socket.close()
             break
 
 # HOST = "0.0.0.0"  # Listen on all available network interfaces
