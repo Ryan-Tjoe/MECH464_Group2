@@ -4,6 +4,16 @@ import cv2 as cv
 import numpy as np
 import argparse
 import time
+import socket
+import json
+import math
+
+# TCP client setup (add this clearly at the top, after your imports)
+TCP_IP = "ROBOT_PC_IP"  # Replace with actual IP of the robot's PC
+TCP_PORT = 5000
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect((TCP_IP, TCP_PORT))
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', help='Path to image or video. Skip to capture frames from camera')
@@ -100,6 +110,8 @@ r_shoulder = points[BODY_PARTS["RShoulder"]]
 r_elbow = points[BODY_PARTS["RElbow"]]
 r_wrist = points[BODY_PARTS["RWrist"]]
 
+start_time = time.time()
+
 if neck and r_shoulder and r_elbow and r_wrist:
     # Axis: Neck → Right Shoulder
     axis_start = neck
@@ -118,6 +130,22 @@ if neck and r_shoulder and r_elbow and r_wrist:
     print(f"Elbow Angle wrt Neck-RShoulder axis: {elbow_angle:.2f}°")
     print(f"Shoulder Angle wrt Neck-RShoulder axis: {shoulder_angle:.2f}°")
 
+    # ===== TCP Sending (exactly here!) =====
+    # Convert angles to radians
+    elbow_angle_rad = math.radians(elbow_angle)
+    shoulder_angle_rad = math.radians(shoulder_angle)
+    
+    t = time.time() - start_time
+    # Prepare JSON data
+    angle_data = {
+        "shoulder_angle": 0.1 * math.sin(t) - 0.76, #shoulder_angle_rad,
+        "elbow_angle": 0.1 * math.sin(t) - 2.3 #elbow_angle_rad
+    }
+
+    # Send data through TCP
+    json_data = json.dumps(angle_data)
+    sock.sendall(json_data.encode("utf-8"))
+    sock.sendall(b"\n")  # Important newline delimiter
 # Optionally, print the coordinates in the terminal using the following code:
 
 #for part in body_parts_of_interest:
@@ -148,3 +176,4 @@ cv.putText(frame, '%.2fms' % (t / freq), (10, 20), cv.FONT_HERSHEY_SIMPLEX, 0.5,
 cv.imshow('OpenPose using OpenCV', frame)
 cv.waitKey(0)  # Wait until key is pressed
 cv.destroyAllWindows()
+sock.close()
