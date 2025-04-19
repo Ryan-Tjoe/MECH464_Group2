@@ -23,6 +23,10 @@ class Server:
         conn.sendall(b"\n")
         print("Data sent successfully.")
 
+    def close(self):
+        self.server_socket.close()
+        print("Server socket closed.")
+
 if __name__ == "__main__":
     HOST = "0.0.0.0"  # Listen on all available network interfaces
     PORT = 5000        # Port number (can be changed)

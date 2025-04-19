@@ -13,12 +13,14 @@ class Client:
         self.sock = None
 
     def connect(self):
-        try:
-            self.sock = socket.create_connection((self.host, self.port))
-            print(f"Connected to {self.host}:{self.port}")
-        except ConnectionRefusedError:
-            print("Could not connect to server. Make sure the server is running.")
-            self.sock = None
+        print(f"trying to connect to {self.host} on port {self.port}")
+        self.sock = socket.create_connection((self.host, self.port), timeout=15.0)
+        print(f"Connected to {self.host}:{self.port}")
+        # try:
+            
+        # except ConnectionRefusedError:
+        #     print("Could not connect to server. Make sure the server is running.")
+        #     self.sock = None
 
     def disconnect(self):
         if self.sock:
@@ -53,7 +55,7 @@ class Client:
 
 
 if __name__ == "__main__":
-    client = Client(host="127.0.0.1", port=5000)
+    client = Client(host="206.87.198.42", port=5000)
     client.connect()
 
     client.send_data(0.5, 1.0)  # Example data
